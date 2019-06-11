@@ -1,0 +1,58 @@
+window.onload = function () {
+    imgLocation("container", "box");
+}
+
+function imgLocation(parent, content) {
+    //将parent下所有的container全部取出
+    var cparent = document.getElementById(parent);//container
+    var ccontent = getChildElement(cparent, content);//得到所有有元素
+    var imgWidth = ccontent[0].offsetWidth;//得到第一张的图片宽度
+    //用浏览器宽度除以图片宽度并取整，得到每行显示几张图片
+    var cols = Math.floor(document.documentElement.clientWidth / imgWidth);
+    //改变container的宽度，并让其居中
+    cparent.style.cssText = "width:" + imgWidth * cols + "px;margin:0 auto;";
+
+    var BoxHeightArr = [];
+    for (var i = 0; i < ccontent.length; i++) {
+        if (i < cols) {
+            //将第一行每张图片的高度遍历出来，放进新数组
+            BoxHeightArr[i] = ccontent[i].offsetHeight;
+        } else {
+            //进入新的一行时，获取上一行的最小值
+            var minheight = Math.min.apply(null, BoxHeightArr);
+            //获取最小值的下标
+            var minIndex = getminheightLocation(BoxHeightArr, minheight);
+            //将图片设置为绝对布局
+            ccontent[i].style.position = "absolute";
+            //设置到container顶部的距离为上一行的最小值
+            ccontent[i].style.top = minheight + "px";
+            //设置container中最小值下标到container左侧的距离
+            ccontent[i].style.left = ccontent[minIndex].offsetLeft + "px";
+            //将两张图片的高度相加获得一个新的高度进行下一次计算
+            BoxHeightArr[minIndex] = BoxHeightArr[minIndex] + ccontent[i].offsetHeight;
+        }
+    }
+}
+
+//高度数组，最小值
+function getminheightLocation(BoxHeightArr, minHeight) {
+    //var i in BoxHeightArr相当于 var i=0;i<BoxHeightArr.length;i++
+    //循环得到最小值下标
+    for (var i in BoxHeightArr) {
+        if (BoxHeightArr[i] == minHeight) {
+            //返回最小值下表
+            return i;
+        }
+    }
+}
+
+function getChildElement(parent, content) {
+    var contentArr = [];//定义数组
+    var allcontent = parent.getElementsByTagName("*");//获取所有元素名
+    for (var i = 0; i < allcontent.length; i++) {//通过循环将元素分别放入数组中
+        if (allcontent[i].className == content) {
+            contentArr.push(allcontent[i]);
+        }
+    }
+    return contentArr;//返回数组
+}
