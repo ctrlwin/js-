@@ -1,5 +1,48 @@
 window.onload = function () {
     imgLocation("container", "box");
+    var imgData = {"data": [{"src": "5.jpg"}, {"src": "6.jpg"}, {"src": "7.jpg"}, {"src": "8.jpg"}, {"src": "9.jpg"}, {"src": "10.jpg"}]}
+    window.onscroll = function () {
+        if (checkFlag()) {
+            var cparent = document.getElementById("container");
+            for (var i = 0; i < imgData.data.length; i++) {
+                //创建节点div
+                var ccontent = document.createElement("div");
+                //给div一个类名box
+                ccontent.className = "box";
+                //将节点添加到cparent后面
+                cparent.appendChild(ccontent);
+                //创建节点
+                var boximg = document.createElement("div");
+                //给div一个类名box_img
+                boximg.className = "box_img";
+                //添加节点
+                ccontent.appendChild(boximg);
+                //创建节点
+                var img = document.createElement("img");
+                //将图片添加进去
+                img.src = "../img/" + imgData.data[i].src;
+                boximg.appendChild(img);
+            }
+            //重新调用imgLoaction方法使得新添加的图片能够有序排放
+            imgLocation("container", "box");
+        }
+    }
+}
+
+function checkFlag() {
+    var cparent = document.getElementById("container");
+    var ccontent = getChildElement(cparent, "box");
+    //获得最后一张图片到顶部的距离
+    var lastContentHeight = ccontent[ccontent.length - 1].offsetTop;
+    //获得滚动的距离||因为有些浏览器不使用documentElement所以添加了document.body
+    var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+    //获得当前页面的高度
+    var pageHeight = document.documentElement.clientHeight || document.body.clientHeight;
+    //当最后一张图片到顶部的距离小于滚动的距离加页面的高度的话就加载，否则不加载
+    if (lastContentHeight < scrollTop + pageHeight) {
+        //例：740：353：438
+        return true;
+    }
 }
 
 function imgLocation(parent, content) {
