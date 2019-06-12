@@ -3,6 +3,7 @@ window.onload = function () {
     var imgData = {"data": [{"src": "5.jpg"}, {"src": "6.jpg"}, {"src": "7.jpg"}, {"src": "8.jpg"}, {"src": "9.jpg"}, {"src": "10.jpg"}]}
     window.onscroll = function () {
         if (checkFlag()) {
+            //开始加载
             var cparent = document.getElementById("container");
             for (var i = 0; i < imgData.data.length; i++) {
                 //创建节点div
@@ -29,6 +30,7 @@ window.onload = function () {
     }
 }
 
+//判断是否需要加载
 function checkFlag() {
     var cparent = document.getElementById("container");
     var ccontent = getChildElement(cparent, "box");
