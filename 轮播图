@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+
+        #outer {
+            width: 520px;
+            height: 333px;
+            margin: 50px auto;
+            padding: 10px 0;
+            background: #ff99cc;
+            /*父元素开启相对定位*/
+            position: relative;
+            /*裁剪溢出的内容*/
+            overflow: hidden;
+        }
+
+        #imgList {
+            /*width: 2600px;*/
+            height: 333px;
+            list-style: none;
+            /*//开启绝对定位后图片才可以切换*/
+            position: absolute;
+            /*每移动520px，切换一次图片*/
+            left: 0;
+        }
+
+        #imgList li {
+            float: left;
+        }
+
+        #imgList img {
+            width: 500px;
+            height: 333px;
+            margin: 0 10px;
+        }
+
+        #navDiv {
+            position: absolute;
+            bottom: 15px;
+            left: 0;
+        }
+
+        #navDiv a {
+            float: left;
+            width: 10px;
+            height: 10px;
+            background: #E87769;
+            margin: 0 7px 0 0;
+            /*设置透明*/
+            opacity: 0.5;
+            /*兼容IE8透明*/
+            filter: alpha(opacity=50);
+        }
+
+        #navDiv a:hover {
+            background: #888888;
+        }
+    </style>
+
+    <script>
+        window.onload = function () {
+
+            //设置imgList的宽度
+            var imgList = document.getElementById("imgList");
+            var imgArr = document.getElementsByTagName("img");
+            imgList.style.width = 520 * imgArr.length + "px";
+
+            //nav居中显示
+            var navDiv = document.getElementById("navDiv");
+            var outer = document.getElementById("outer");
+            /*居中：(520-17*5)/2*/
+            navDiv.style.left = (outer.offsetWidth - navDiv.offsetWidth) / 2 + "px";
+
+            //默认显示第一张图片
+            var index = 0;
+            var allA = document.getElementsByTagName("a");
+            allA[index].style.backgroundColor = "#888888";
+
+            //点击超链接切换显示的图片
+            for (var i = 0; i < allA.length; i++) {
+                allA[i].num = i;
+                //为所有超链接绑定单击函数
+                allA[i].onclick = function () {
+                    //关闭上一个动画
+                    clearInterval(timer);
+                    //当前选中的图片
+                    index = this.num;
+                    // imgList.style.left = -520 * index + "px";
+                    setA();
+                    //使用move函数来切换图片
+                    move(imgList, -520 * index, 20, "left", function () {
+
+                        //动画执行完毕，开启自动切换
+                        autoChange();
+                    });
+                };
+            }
+
+            //开启自动切换
+            autoChange();
+
+            //创建一个方法用来设置选中的a
+            function setA() {
+                //判断索引是否是最后一张
+                if (index >= imgArr.length - 1) {
+                    index = 0;
+
+                    //此时显示的是最后一张，而最后一张和第一张一模一样
+                    //然后通过css设置它的left，让它瞬间切换到第一张
+                    imgList.style.left = 0;
+                }
+
+                for (var i = 0; i < allA.length; i++) {
+                    //由于内联样式优先级较高，所以此处不能设置样式
+                    allA[i].style.backgroundColor = "";
+                }
+                //将选中的a设置为灰色
+                allA[index].style.backgroundColor = "#888888";
+            }
+
+            var timer;
+
+            //自动切换图片
+            function autoChange() {
+                timer = setInterval(function () {
+                    index++;
+                    //当index到达最大值时，将它赋值为0
+                    index %= imgArr.length;
+                    move(imgList, -520 * index, 20, "left", function () {
+                        setA();
+                    });
+                }, 1500);
+            }
+
+            function move(obj, target, speed, attr, callback) {
+                //关闭上一个定时器
+                clearInterval(obj.timer);
+
+                //获取元素目前位置
+                var current = parseInt(getStyle(obj, attr));
+
+                //判断速度的正负值
+                //如果从0到800移动，则speed为正
+                //如果从800到0移动，则speed为负
+                if (current > target) {
+                    speed = -speed;
+                }
+
+                //向执行动画的对象中添加一个timer属性，用来保存它自己的定时器标识
+                obj.timer = setInterval(function () {
+                    //获取box1原来的left值,"10px"为字符，
+                    // 可以通过parseint转换为数值型来进行计算
+                    var oldValue = parseInt(getStyle(obj, attr));
+                    //再旧值的基础上增加
+                    var newValue = oldValue + speed;
+
+                    if (speed < 0 && newValue < target || speed > 0 && newValue > target) {
+                        newValue = target;
+                    }
+
+                    obj.style[attr] = newValue + "px";
+
+                    if (newValue == target) {
+                        clearInterval(obj.timer);
+
+                        callback && callback();
+                    }
+
+                }, 30);
+            }
+
+            //获取样式
+            function getStyle(obj, name) {
+                if (window.getComputedStyle) {
+                    //正常浏览器的方式，具有getComputedStyle()方法
+                    return getComputedStyle(obj, null)[name];
+                } else {
+                    //Ie8的方法，没有getComputedStyle()方法
+                    return obj.currentStyle[name];
+                }
+            }
+
+        };
+    </script>
+</head>
+<body>
+<div id="outer">
+    <ul id="imgList">
+        <li><img src="img/5.jpg" alt=""></li>
+        <li><img src="img/6.jpg" alt=""></li>
+        <li><img src="img/7.jpg" alt=""></li>
+        <li><img src="img/8.jpg" alt=""></li>
+        <li><img src="img/9.jpg" alt=""></li>
+        <li><img src="img/5.jpg" alt=""></li>
+    </ul>
+    <div id="navDiv">
+        <a href="javascript:;"></a>
+        <a href="javascript:;"></a>
+        <a href="javascript:;"></a>
+        <a href="javascript:;"></a>
+        <a href="javascript:;"></a>
+    </div>
+</div>
+</body>
+</html>
